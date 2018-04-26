@@ -1,0 +1,46 @@
+---
+title: ""
+author: ""
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=TRUE, echo=FALSE,message=FALSE}
+#devtools::install_github("hrbrmstr/qrencoder")
+library(qrencoder)
+library(uuid)
+library(jsonlite)
+outwidth <- input$imagesize
+knitr::opts_chunk$set(out.width = paste0(outwidth,"%")) 
+```
+
+----------------------------------------------------------
+**Parameters chosen for this print:**
+Colletion: `r paste(input$x)`|
+Dataset: `r paste(input$dataset)` |
+Textsize: `r paste(input$textsize)` |
+labelsize: `r paste(input$imagesize)` |
+RecordNumber's: `r paste(input$recordNumber[1])` to `r paste(input$recordNumber[2])`
+
+----------------------------------------------------------
+
+```{r plot, include=TRUE,echo=FALSE}
+#devtools::install_github("hrbrmstr/qrencoder")
+N <- dim(inndata_selected())[1]
+for(i in 1:N){
+    inndata_selected <- inndata_selected()
+      inputString <- toJSON(inndata_selected[i,])
+      printString_l1 <- paste("occurrenceID:",inndata_selected$occurrenceID[i])
+      printString_l2 <- paste("recordNumber:",inndata_selected$recordNumber[i])
+      par(mar=c(4,4,4,4))
+      image(qrencode_raster(inputString), 
+            asp=1, col=c("white", "black"), axes=FALSE, 
+            xlab="", ylab="",bty="l")
+      mtext(printString_l1,side=1,line = 1,cex=input$textsize)
+      mtext(printString_l2,side=1,line = 2,cex=input$textsize)
+      box(which = "outer", lty = "solid")
+}
+
+
+```
+
