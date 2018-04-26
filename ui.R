@@ -1,6 +1,7 @@
 
 
 source("dataIO.R")
+source("label_templates.R")
 # UI
 fluidPage(
   title = 'Download QR-code labels',
@@ -19,10 +20,13 @@ fluidPage(
                   min=min(inndata$recordNumber), 
                   max=max(inndata$recordNumber), 
                   value=c(1,10),dragRange=TRUE),
+      selectInput('labeltext_1', 'Choose label template:',
+                  choices = c("QR only","QR + recordNumber")),
       
       downloadButton('labels')
     ),
     mainPanel(
+      verbatimTextOutput("text"),
       plotOutput('testlabel'),
       tableOutput("table1")
     )

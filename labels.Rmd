@@ -11,7 +11,10 @@ library(qrencoder)
 library(uuid)
 library(jsonlite)
 outwidth <- input$imagesize
-knitr::opts_chunk$set(out.width = paste0(outwidth,"%")) 
+knitr::opts_chunk$set(#fig.align="left",
+                      out.width = paste0(outwidth,"%"),
+                      dpi=150,
+                      dev='pdf') 
 ```
 
 ----------------------------------------------------------

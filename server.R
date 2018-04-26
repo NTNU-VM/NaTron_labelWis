@@ -7,30 +7,27 @@ library(dplyr)
 # Shiny server
 function(input, output) {
   
-  output$selected_var <- renderText({ input$recordNumber })
-  
+  # select data
   inndata_selected <- reactive({
     a <- inndata %>% filter(recordNumber<=input$recordNumber[2] &
                             recordNumber>=input$recordNumber[1])
     return(a)
   })
-  
+
+  # create tabel for preview of data
   output$table1 <- renderTable(inndata_selected())
   
+  # create plot for preview
   output$testlabel <- renderPlot({
     inndata_selected <- inndata_selected()
-      inputString <- toJSON(inndata_selected[1,])
-      printString_l1 <- paste("occurrenceID:",inndata_selected$occurrenceID[1])
-      printString_l2 <- paste("recordNumber:",inndata_selected$recordNumber[1])
-      par(mar=c(4,4,4,4))
-      image(qrencode_raster(inputString), 
-            asp=1, col=c("white", "black"), axes=FALSE, 
-            xlab="", ylab="",bty="l")
-      mtext(printString_l1,side=1,line = 1,cex=input$textsize)
-      mtext(printString_l2,side=1,line = 2,cex=input$textsize)
-      box(which = "outer", lty = "solid")
+    QR <- toJSON(inndata_selected[1,]) # data to QR code
+    f_QR_only(QR)
+    
+    
+    
   })
   
+  # create download of pdf by rendering rmarkdown file
   output$labels <- downloadHandler(
     # For PDF output, change this to "report.pdf"
     filename = "labels.pdf",
