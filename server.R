@@ -19,12 +19,27 @@ function(input, output) {
   
   # create plot for preview
   output$testlabel <- renderPlot({
-    inndata_selected <- inndata_selected()
-    QR <- toJSON(inndata_selected[1,]) # data to QR code
-    f_QR_only(QR)
-    
-    
-    
+    if (input$label_template=="QR + text"){
+      inndata_selected <- inndata_selected()
+      QRcode <- toJSON(inndata_selected[1,]) # data to QR code
+      textSize <- input$textsize
+      prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[1])
+      prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[1])
+      prst_s3 <- paste("scientificName:",inndata_selected$scientificName[1])
+      prst_s4 <- paste("collectionCode:",inndata_selected$collectionCode[1])
+      f_plot_label(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) 
+    }
+    if (input$label_template=="QR only"){
+      inndata_selected <- inndata_selected()
+      QRcode <- toJSON(inndata_selected[1,]) # data to QR code
+      textSize <- input$textsize
+      prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[1])
+      prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[1])
+      prst_s3 <- paste("scientificName:",inndata_selected$scientificName[1])
+      prst_s4 <- paste("collectionCode:",inndata_selected$collectionCode[1])
+      f_plot_label(QRcode,textSize)#,prst_s1,prst_s2,prst_s3,prst_s4) 
+    }
+
   })
   
   # create download of pdf by rendering rmarkdown file
