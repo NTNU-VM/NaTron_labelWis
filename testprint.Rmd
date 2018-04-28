@@ -1,0 +1,65 @@
+---
+title: "test"
+author: ""
+date: ""
+output: pdf_document
+geometry: margin=1.5in
+---
+
+```{r setup, include=TRUE, echo=FALSE,message=FALSE}
+#devtools::install_github("hrbrmstr/qrencoder")
+library(qrencoder)
+library(uuid)
+library(jsonlite)
+library(dplyr)
+library(knitr)
+#outwidth <- input$imagesize
+knitr::opts_chunk$set(#fig.align="left",
+                      #out.width = paste0(outwidth,"%"),
+                      dpi=150,
+                      dev='pdf') 
+```
+
+```{r create_plot, include=TRUE,echo=FALSE,message=FALSE}
+#devtools::install_github("hrbrmstr/qrencoder")
+
+source("dataIO.R")
+source("functions.R")
+
+tempdir1 <- tempdir()
+textSize <- 2
+inndata_selected <- inndata[1:10,]
+inndata_to_QR <- inndata_selected %>% select(materialSampleID)
+N <- dim(inndata_selected)[1]
+for(i in 1:10){
+  QRcode <- toJSON(data.frame(materialSampleID=inndata_to_QR[1,])) # data to QR code
+
+  prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[i])
+  prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[i])
+  prst_s3 <- paste("scientificName:",inndata_selected$scientificName[i])
+  prst_s4 <- paste("collectionCode:",inndata_selected$collectionCode[i])
+  
+  tempdir1 <- tempdir()
+  labelname <- sprintf("label_%04d.jpeg", i)
+  filepath <- paste0(tempdir1,"/",labelname)
+
+  jpeg(filename = paste0(filepath),
+     width = 60, height = 60, units = "mm", pointsize = 8,
+     quality = 75,res=150,
+     bg = "white")
+  f_plot_label(QRcode,textSize,prst_s1)
+  dev.off()
+
+}
+#list.files(tempdir1)
+
+```
+
+```{r plot_labels, include=TRUE,echo=FALSE}
+labelstoplot <-list.files(tempdir1, pattern = ".jpeg", full.names = TRUE)
+include_graphics(labelstoplot)
+```
+
+
+
+

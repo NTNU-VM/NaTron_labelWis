@@ -10,9 +10,11 @@ output: pdf_document
 library(qrencoder)
 library(uuid)
 library(jsonlite)
+library(dplyr)
+library(knitr)
 outwidth <- input$imagesize
 knitr::opts_chunk$set(#fig.align="left",
-                      out.width = paste0(outwidth,"%"),
+                      #out.width = paste0(outwidth,"%"),
                       dpi=150,
                       dev='pdf') 
 ```
@@ -28,22 +30,47 @@ RecordNumber's: `r paste(input$recordNumber[1])` to `r paste(input$recordNumber[
 ----------------------------------------------------------
 
 ```{r plot, include=TRUE,echo=FALSE}
-#devtools::install_github("hrbrmstr/qrencoder")
-N <- dim(inndata_selected())[1]
-for(i in 1:N){
-    inndata_selected <- inndata_selected()
-      inputString <- toJSON(inndata_selected[i,])
-      printString_l1 <- paste("occurrenceID:",inndata_selected$occurrenceID[i])
-      printString_l2 <- paste("recordNumber:",inndata_selected$recordNumber[i])
-      par(mar=c(4,4,4,4))
-      image(qrencode_raster(inputString), 
-            asp=1, col=c("white", "black"), axes=FALSE, 
-            xlab="", ylab="",bty="l")
-      mtext(printString_l1,side=1,line = 1,cex=input$textsize)
-      mtext(printString_l2,side=1,line = 2,cex=input$textsize)
-      box(which = "outer", lty = "solid")
+
+# define parameters for label
+inndata_selected <- inndata_selected()
+inndata_to_QR <- inndata_selected %>% select(materialSampleID)
+textSize <- input$textsize
+N <- dim(inndata_selected)[1]
+
+# loop through all records and print label as .jpeg to tempdir
+for(i in 1:10){
+  QRcode <- toJSON(data.frame(materialSampleID=inndata_to_QR[1,])) # data to QR code
+  prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[i])
+  prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[i])
+  prst_s3 <- paste("scientificName:",inndata_selected$scientificName[i])
+  prst_s4 <- paste("collectionCode:",inndata_selected$collectionCode[i])
+      
+  # A temp file to save the output.
+  # This file will be removed later by renderImage
+  outfile <- tempfile(fileext = '.jpeg')
+      
+  # Generate the jpeg (initiate grapich device - printing figure to jpg)
+  # and set specifications
+  jpeg(filename = outfile,
+        width = input$labelWidth, height = input$labelHeigth, units = "mm", pointsize = 8,
+        quality = 75,res=150,
+        bg = "white")
+    
+  # choose label text according to label_template imput from UI
+  if (input$label_template=="QR only"){
+    f_plot_label(QRcode,textSize) 
+  }
+  if (input$label_template=="QR + text"){
+    f_plot_label(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) 
+  }
+  if (input$label_template=="QR + catalogNumber & collectionCode"){
+    f_plot_label(QRcode,textSize,prst_s2,prst_s4) 
+  }
+  dev.off() # shut down graphic device 
 }
 
+labelstoplot <-list.files(tempdir(), pattern = ".jpeg", full.names = TRUE)
+include_graphics(labelstoplot)
 
 ```
 

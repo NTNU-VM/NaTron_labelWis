@@ -24,10 +24,13 @@ f_plot_label <- function(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) {
   box(which = "outer", lty = "solid")
 }
 
-## function testing
+# # ## function testing
+# library(dplyr)
+# library(qrencoder)
+# library(jsonlite)
 # source("dataIO.R")
 # inndata_selected <- inndata#inndata_selected()
-# inndata_to_QR <- inndata_selected %>% select(occurrenceID)
+# inndata_to_QR <- inndata_selected %>% select(materialSampleID)
 # QRcode <- toJSON(inndata_to_QR[1,]) # data to QR code
 # textSize <- 1 #input$textsize
 # prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[1])
@@ -37,4 +40,16 @@ f_plot_label <- function(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) {
 # f_plot_label(QRcode,textSize,prst_s1)#,prst_s2,prst_s3,prst_s4)
 # f_plot_label(QRcode,textSize,prst_s1,prst_s2)#,prst_s3,prst_s4)
 # f_plot_label(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4)
+# # 
+# # save plot to jpg
+# ggg <- tempdir()
+# jpeg(filename = paste0(ggg,"/tmp.jpeg"),
+#      width = 75, height = 75, units = "mm", pointsize = 12,
+#      quality = 75,res=150,
+#      bg = "white")
+# f_plot_label(QRcode,textSize,prst_s1)
+# dev.off()
+
+
+
 

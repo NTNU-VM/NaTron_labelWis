@@ -5,13 +5,13 @@ library(jsonlite)
 # generate test data for input
 N <- 100 # for testing
 recordNumber <- as.numeric()
-occurrenceID <- as.character()
+materialSampleID <- as.character()
 scientificName <- as.character()
 collectionCode <- as.character()
 catalogNumber <- as.numeric()
 
 for (i in 1:N){
-  occurrenceID[i] <- as.character(UUIDgenerate())
+  materialSampleID[i] <- as.character(UUIDgenerate())
   recordNumber[i] <- as.numeric(seq(1:N)[i])
   scientificName[i] <- sample(x=c("Microtus agrestis Linnaeus, 1761",
                                   "Castor fiber Linnaeus, 1758",
@@ -22,7 +22,7 @@ for (i in 1:N){
   
 }
 
-inndata <- data.frame(occurrenceID=occurrenceID,
+inndata <- data.frame(materialSampleID=materialSampleID,
                       recordNumber=recordNumber,
                       scientificName=scientificName,
                       collectionCode=collectionCode,
