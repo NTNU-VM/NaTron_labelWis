@@ -7,12 +7,15 @@ library(dplyr)
 # Shiny server
 function(input, output) {
   
-  # select data
+  # inndata selected is selected rows in datatable
   inndata_selected <- reactive({
-    a <- inndata %>% filter(recordNumber<=input$recordNumber[2] &
-                            recordNumber>=input$recordNumber[1])
+    s <- input$labelDataTable_rows_all # rows selected from datatable (NB: "labelDataTable" is the dataTabel ID)
+    a <- as.data.frame(inndata[s,])
+    names(a) <- names(inndata)
     return(a)
   })
+    
+    
 
   # Create image of label for preview
     output$labelImage <- renderImage({
@@ -20,6 +23,7 @@ function(input, output) {
     inndata_to_QR <- inndata_selected %>% select(materialSampleID)
     QRcode <- toJSON(data.frame(materialSampleID=inndata_to_QR[1,])) # data to QR code
     textSize <- input$textsize
+    marg1 <- input$labelMargin
     prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[1])
     prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[1])
     prst_s3 <- paste("scientificName:",inndata_selected$scientificName[1])
@@ -37,13 +41,13 @@ function(input, output) {
     
     # choose label text according to label_template imput from UI
     if (input$label_template=="QR only"){
-      f_plot_label(QRcode,textSize) 
+      f_plot_label(QRcode,textSize,marg1) 
     }
     if (input$label_template=="QR + text"){
-      f_plot_label(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) 
+      f_plot_label(QRcode,textSize,marg1,prst_s1,prst_s2,prst_s3,prst_s4) 
     }
     if (input$label_template=="QR + catalogNumber & collectionCode"){
-      f_plot_label(QRcode,textSize,prst_s2,prst_s4) 
+      f_plot_label(QRcode,textSize,marg1,prst_s2,prst_s4) 
     }
     dev.off()
       
@@ -57,7 +61,8 @@ function(input, output) {
   # create tabel for preview of data
   #output$table1 <- renderTable(inndata_selected())
   output$labelDataTable <- DT::renderDataTable(
-    inndata_selected(), 
+    #inndata_selected(),
+    inndata, 
     filter = "top"
   )
   
@@ -78,6 +83,8 @@ function(input, output) {
       )
     }
   )
-  
+  on.exit(
+    file.remove(list.files(tempdir(), pattern = ".jpeg", full.names = TRUE))
+    )
 }
 

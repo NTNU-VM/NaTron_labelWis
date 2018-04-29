@@ -28,10 +28,11 @@ source("functions.R")
 
 tempdir1 <- tempdir()
 textSize <- 2
+marg1 <- 4
 inndata_selected <- inndata[1:10,]
 inndata_to_QR <- inndata_selected %>% select(materialSampleID)
 N <- dim(inndata_selected)[1]
-for(i in 1:10){
+for(i in 1:12){
   QRcode <- toJSON(data.frame(materialSampleID=inndata_to_QR[1,])) # data to QR code
 
   prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[i])
@@ -47,17 +48,23 @@ for(i in 1:10){
      width = 60, height = 60, units = "mm", pointsize = 8,
      quality = 75,res=150,
      bg = "white")
-  f_plot_label(QRcode,textSize,prst_s1)
+  f_plot_label(QRcode,textSize,marg1,prst_s1,prst_s2)
   dev.off()
 
 }
 #list.files(tempdir1)
-
+#list.files(tempdir())
 ```
 
 ```{r plot_labels, include=TRUE,echo=FALSE}
 labelstoplot <-list.files(tempdir1, pattern = ".jpeg", full.names = TRUE)
 include_graphics(labelstoplot)
+```
+
+
+```{r remove_tmpfiles, include=TRUE,echo=FALSE}
+# Remove temporary files
+#file.remove(labelstoplot)
 ```
 
 

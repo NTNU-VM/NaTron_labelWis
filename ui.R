@@ -16,22 +16,21 @@ fluidPage(
                   min=10, max=150, value=60),
       sliderInput("labelHeigth", label="Choose labels heigth:", 
                   min=10, max=150, value=60),
+      sliderInput("labelMargin", label="Choose labels margin:", 
+                  min=0.5, max=6, value=4,step=0.5),
       sliderInput("textsize", label="Choose text size:", 
                   min=0, max=4, value=1,step=0.05),
-      sliderInput("recordNumber", label="Choose recordNumbers:", 
-                  min=min(inndata$recordNumber), 
-                  max=max(inndata$recordNumber), 
-                  value=c(1,10),dragRange=TRUE),
       selectInput('label_template', 'Choose label template:',
                   choices = c("QR only","QR + text","QR + catalogNumber & collectionCode")),
       
       downloadButton('labels')
     ),
     mainPanel(
-      verbatimTextOutput("text"),
-      #plotOutput('testlabel'),
+      h3("Preview of label"),
       imageOutput("labelImage"),
-      #tableOutput("table1")
+      br(),
+      h3("Preview of input data for labels"),
+      p("Select records for printing to labels. Subset table by using the boxes above columns, or the 'search' field"),
       DT::dataTableOutput("labelDataTable")
     )
   )

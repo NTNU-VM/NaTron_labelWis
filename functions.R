@@ -4,8 +4,8 @@
 
 
 
-f_plot_label <- function(QRcode,textSize,prst_s1,prst_s2,prst_s3,prst_s4) {
-  par(mar=c(4,4,4,4))
+f_plot_label <- function(QRcode,textSize,marg1,prst_s1,prst_s2,prst_s3,prst_s4) {
+  par(mar=c(marg1,marg1,marg1,marg1))
   image(qrencode_raster(QRcode), 
         asp=1, col=c("white", "black"), axes=FALSE, 
         xlab="", ylab="",bty="l")
