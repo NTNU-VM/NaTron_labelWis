@@ -29,7 +29,7 @@ fluidPage(
       h3("Preview of label"),
       imageOutput("labelImage"),
       br(),
-      h3("Preview of input data for labels"),
+      h3("Preview and select input data for labels"),
       p("Select records for printing to labels. Subset table by using the boxes above columns, or the 'search' field"),
       DT::dataTableOutput("labelDataTable")
     )
