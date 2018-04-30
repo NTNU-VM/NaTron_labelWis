@@ -22,8 +22,10 @@ fluidPage(
                   min=0, max=4, value=1,step=0.05),
       selectInput('label_template', 'Choose label template:',
                   choices = c("QR only","QR + text","QR + catalogNumber & collectionCode")),
-      
-      downloadButton('labels')
+      downloadButton('labels'),
+      br(),
+      br(),
+      a("View code and technical documentation at GitHub", href="https://github.com/NTNU-VM/NaTron_labelWis",target="_blank")
     ),
     mainPanel(
       h3("Preview of label"),
