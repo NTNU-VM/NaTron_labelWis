@@ -13,7 +13,6 @@ library(uuid)
 library(jsonlite)
 library(dplyr)
 library(knitr)
-outwidth <- input$imagesize
 knitr::opts_chunk$set(#fig.align="left",
                       #out.width = paste0(outwidth,"%"),
                       dpi=150,
@@ -26,7 +25,7 @@ Colletion: `r paste(input$x)`|
 Dataset: `r paste(input$dataset)` |
 Textsize: `r paste(input$textsize)` |
 labelsize: `r paste(input$imagesize)` |
-RecordNumber's: `r paste(input$recordNumber[1])` to `r paste(input$recordNumber[2])`
+`
 
 ----------------------------------------------------------
 
@@ -34,7 +33,7 @@ RecordNumber's: `r paste(input$recordNumber[1])` to `r paste(input$recordNumber[
 
 # define parameters for label
 inndata_selected <- inndata_selected()
-inndata_to_QR <- inndata_selected %>% select(materialSampleID)
+inndata_to_QR <- inndata_selected %>% select(input$QRcontent)
 textSize <- input$textsize
 marg1 <- input$labelMargin
 N <- dim(inndata_selected)[1]
@@ -42,11 +41,50 @@ sessionID <- UUIDgenerate() # get uniqe ID of the pdf in to identify tempfiles g
   
 # loop through all records and print label as .jpeg to tempdir
 for(i in 1:N){
-  QRcode <- toJSON(data.frame(materialSampleID=inndata_to_QR[1,])) # data to QR code
-  prst_s1 <- paste("recordNumber:",inndata_selected$recordNumber[i])
-  prst_s2 <- paste("catalogNumber:",inndata_selected$catalogNumber[i])
-  prst_s3 <- paste("scientificName:",inndata_selected$scientificName[i])
-  prst_s4 <- paste("collectionCode:",inndata_selected$collectionCode[i])
+  json_out <- inndata_to_QR %>% filter(row_number()==i)
+  QRcode <- toJSON(json_out)
+    textSize <- input$textsize
+    marg1 <- input$labelMargin
+    
+    # input to label text
+    inndata_selected <- inndata_selected()
+    
+    if(input$bottom_text==""){
+      prst_s1 <- ""
+    } else {
+      prst_s1_data <- inndata_selected %>% 
+        select(input$bottom_text) %>%
+        filter(row_number()==i)
+      prst_s1 <- paste0(names(prst_s1_data), ": ", prst_s1_data[1,])
+    }
+
+    if(input$left_side_text==""){
+      prst_s2 <- ""
+    } else {
+    prst_s2_data <- inndata_selected %>% 
+      select(input$left_side_text) %>%
+      filter(row_number()==i)
+    prst_s2 <- paste0(names(prst_s2_data), ": ", prst_s2_data[1,])
+    }
+    
+    if(input$top_text==""){
+      prst_s3 <- ""
+    } else {
+    prst_s3_data <- inndata_selected %>% 
+      select(input$top_text) %>%
+      filter(row_number()==i)
+    prst_s3 <- paste0(names(prst_s3_data), ": ", prst_s3_data[1,])
+    }
+    
+    if(input$rigth_side_text==""){
+      prst_s4 <- ""
+    } else {
+    prst_s4_data <- inndata_selected %>% 
+      select(input$rigth_side_text) %>%
+      filter(row_number()==i)
+    prst_s4 <- paste0(names(prst_s4_data), ": ", prst_s4_data[1,])
+    }
+
       
   # A temp file to save the output.
   # This file will be removed later by renderImage
@@ -54,23 +92,18 @@ for(i in 1:N){
   tempdir1 <- tempdir()
   labelname <- paste0(sessionID,sprintf("label_%04d.jpeg", i))
   filepath <- paste0(tempdir1,"/",labelname)    
+  
   # Generate the jpeg (initiate grapich device - printing figure to jpg)
   # and set specifications
   jpeg(filename = filepath,
         width = input$labelWidth, height = input$labelHeigth, units = "mm", pointsize = 8,
         quality = 75,res=150,
         bg = "white")
-    
-  # choose label text according to label_template imput from UI
-  if (input$label_template=="QR only"){
-    f_plot_label(QRcode,textSize,marg1) 
-  }
-  if (input$label_template=="QR + text"){
-    f_plot_label(QRcode,textSize,marg1,prst_s1,prst_s2,prst_s3,prst_s4) 
-  }
-  if (input$label_template=="QR + catalogNumber & collectionCode"){
-    f_plot_label(QRcode,textSize,marg1,prst_s2,prst_s4) 
-  }
+  
+  # Plot label by running function defined in the "function.R" file
+      f_plot_label(QRcode,textSize,marg1,prst_s1,prst_s2,
+                   prst_s3,prst_s4)  
+
   dev.off() # shut down graphic device 
 }
 
