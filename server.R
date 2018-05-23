@@ -6,6 +6,14 @@ library(dplyr)
 
 # Shiny server
 function(input, output) {
+  
+  # create tabel for preview of data
+  #output$table1 <- renderTable(inndata_selected())
+  output$labelDataTable <- DT::renderDataTable(#inndata_selected(),
+    inndata,
+    filter = "top",
+    selection = list(target = 'row+column'))
+  
   # inndata selected is selected rows in datatable
   inndata_selected <- reactive({
     s <-
@@ -15,6 +23,8 @@ function(input, output) {
     return(a)
   })
   
+
+
   # QR code content
   qrcode_content <- reactive({
     inndata_selected <- inndata_selected()
@@ -32,12 +42,13 @@ function(input, output) {
   
   # Create image of label for preview
   output$labelImage <- renderImage({
-    # data to QR-code
+    # input parameters and data to QR-code
     QRcode_data <- qrcode_content()
     QRcode_data <- QRcode_data %>% filter(row_number()==1)
     QRcode <- toJSON(QRcode_data)
     textSize <- input$textsize
     marg1 <- input$labelMargin
+    line_prst_s1 <- input$bottom_text_line
     
     # input to label text
     inndata_selected <- inndata_selected()
@@ -100,6 +111,7 @@ function(input, output) {
                    textSize,
                    marg1,
                    prst_s1,
+                   line_prst_s1,
                    prst_s2,
                    prst_s3,
                    prst_s4)
@@ -112,15 +124,8 @@ function(input, output) {
     
   }, deleteFile = TRUE) # delete output file after sending data
   
-  # create tabel for preview of data
-  #output$table1 <- renderTable(inndata_selected())
-  output$labelDataTable <- DT::renderDataTable(#inndata_selected(),
-    inndata,
-    filter = "top")
-  
-  
   # create download of pdf by rendering rmarkdown file
-  output$labels <- downloadHandler(
+  output$labels_pdf <- downloadHandler(
     # For PDF output, change this to "report.pdf"
     filename = "labels.pdf",
     content = function(file) {
@@ -134,8 +139,13 @@ function(input, output) {
       rmarkdown::render(tempLabels, output_file = file)
     }
   )
+  # clean up cache on exit
   on.exit(file.remove(list.files(
     tempdir(), pattern = ".jpeg", full.names = TRUE
   )))
+  
+  
+  
+
 }
 
